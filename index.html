@@ -3,30 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Migdhaam IOU</title>
+    <title>Migdhaam IOU's to Mariyam</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Migdhaam IOU to Mariyam</h1>
+    <h1>Migdhaam IOU's to Mariyam</h1>
 
     <div class="form-container">
         <label for="item">Item:</label>
         <input type="text" id="item" name="item">
         
-        <label for="total">Total (MVR):</label>
+        <label for="total">Total:</label>
         <input type="number" id="total" name="total">
+
+        <label for="currency">Currency:</label>
+        <select id="currency" name="currency">
+            <option value="MVR" selected>MVR</option>
+            <option value="USD">USD</option>
+        </select>
 
         <label for="date">Date:</label>
         <input type="date" id="date" name="date">
         
         <button onclick="addIOU()">Add IOU</button>
+        <button onclick="clearFields()">Clear Fields</button>
     </div>
 
     <table id="iouTable">
         <thead>
             <tr>
                 <th>Item</th>
-                <th>Total (MVR)</th>
+                <th>Total</th>
+                <th>Currency</th>
                 <th>Date</th>
             </tr>
         </thead>
@@ -35,8 +43,12 @@
         </tbody>
         <tfoot>
             <tr>
-                <td>Total IOU:</td>
-                <td colspan="2" id="totalIou">0</td>
+                <td>Total MVR IOU:</td>
+                <td colspan="3" id="totalMvrIou">0</td>
+            </tr>
+            <tr>
+                <td>Total USD IOU:</td>
+                <td colspan="3" id="totalUsdIou">0</td>
             </tr>
         </tfoot>
     </table>
@@ -49,6 +61,7 @@
         function addIOU() {
             const item = document.getElementById('item').value;
             const total = document.getElementById('total').value;
+            const currency = document.getElementById('currency').value;
             const date = document.getElementById('date').value;
 
             if (item && total && date) {
@@ -63,6 +76,10 @@
                 totalCell.textContent = total;
                 newRow.appendChild(totalCell);
 
+                const currencyCell = document.createElement('td');
+                currencyCell.textContent = currency;
+                newRow.appendChild(currencyCell);
+
                 const dateCell = document.createElement('td');
                 dateCell.textContent = date;
                 newRow.appendChild(dateCell);
@@ -70,19 +87,36 @@
                 tableBody.appendChild(newRow);
 
                 updateTotalIOU();
+                clearFields();
             }
         }
 
         function updateTotalIOU() {
-            let totalIou = 0;
+            let totalMvrIou = 0;
+            let totalUsdIou = 0;
+
             const rows = document.querySelectorAll('#iouBody tr');
 
             rows.forEach(row => {
-                const totalCell = row.querySelector('td:nth-child(2)');
-                totalIou += parseFloat(totalCell.textContent);
+                const currency = row.querySelector('td:nth-child(3)').textContent;
+                const total = parseFloat(row.querySelector('td:nth-child(2)').textContent);
+
+                if (currency === 'MVR') {
+                    totalMvrIou += total;
+                } else if (currency === 'USD') {
+                    totalUsdIou += total;
+                }
             });
 
-            document.getElementById('totalIou').textContent = totalIou;
+            document.getElementById('totalMvrIou').textContent = totalMvrIou.toFixed(2);
+            document.getElementById('totalUsdIou').textContent = totalUsdIou.toFixed(2);
+        }
+
+        function clearFields() {
+            document.getElementById('item').value = '';
+            document.getElementById('total').value = '';
+            document.getElementById('currency').value = 'MVR';
+            document.getElementById('date').value = '';
         }
 
         function clearIOUs() {
